@@ -1,15 +1,136 @@
 {% extends "layout.html" %}
 {% block title %}Login{% endblock %}
+
 {% block content %}
+<style>
+/* Container Styling */
+.login-container {
+    max-width: 400px;
+    margin: 80px auto;
+    padding: 40px 30px;
+    background: rgba(255,255,255,0.15); /* semi-transparent */
+    backdrop-filter: blur(15px); /* glass effect */
+    border-radius: 25px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+    font-family: 'Arial', sans-serif;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Gradient Background */
+.login-container::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, #ff9a9e, #1d0690ff, #a18cd1, #ac1b83ff);
+    background-size: 400% 400%;
+    z-index: 0; /* behind content */
+    border-radius: 25px;
+}
+
+/* Ensure form content is above background */
+.login-container > * {
+    position: relative;
+    z-index: 1;
+    color: #fff; /* text visible */
+}
+
+/* Heading Styling */
+h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    font-weight: 700;
+    text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+}
+
+/* Form Styling */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 14px 18px;
+    border-radius: 15px;
+    border: none;
+    font-size: 16px;
+    background: rgba(242, 242, 245, 0.9);
+    color: #333;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    box-shadow: 0 0 15px rgba(11, 9, 174, 0.8);
+    outline: none;
+}
+
+/* Button Styling */
+.btn-primary {
+    width: 100%;
+    padding: 14px;
+    border-radius: 15px;
+    font-weight: 600;
+    background: linear-gradient(135deg, #6a11cb, #2575fc, #ff6a88);
+    border: none;
+    color: #2f06b6ff;
+    font-size: 16px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.btn-primary:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 25px rgba(0,0,0,0.35);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .login-container {
+        margin: 50px 20px;
+        padding: 30px 20px;
+    }
+
+    h2 {
+        font-size: 24px;
+    }
+
+    .btn-primary {
+        padding: 12px;
+        font-size: 14px;
+    }
+}
+</style>
+
+<div class="login-container">
     <h2>Login</h2>
     <form method="POST">
         {{ form.hidden_tag() }}
         <div class="form-group">
-            {{ form.email.label }} {{ form.email(class="form-control") }}
+            {{ form.email.label }} 
+            {{ form.email(class="form-control") }}
         </div>
         <div class="form-group">
-            {{ form.password.label }} {{ form.password(class="form-control") }}
+            {{ form.password.label }} 
+            {{ form.password(class="form-control") }}
         </div>
         {{ form.submit(class="btn btn-primary") }}
     </form>
+</div>
+
+<script>
+// Interactive Input Effects
+const inputs = document.querySelectorAll('.form-control');
+inputs.forEach(input => {
+    input.addEventListener('focus', () => {
+        input.style.transform = 'scale(1.02)';
+        input.style.boxShadow = '0 0 15px rgba(50, 62, 202, 0.7)';
+    });
+    input.addEventListener('blur', () => {
+        input.style.transform = 'scale(1)';
+        input.style.boxShadow = 'none';
+    });
+});
+</script>
 {% endblock %}

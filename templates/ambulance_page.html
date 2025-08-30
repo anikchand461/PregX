@@ -1,16 +1,137 @@
 {% extends "layout.html" %}
 {% block title %}Ambulance Page{% endblock %}
+
 {% block content %}
+<style>
+    /* General Container Styling */
+    .container-ambulance {
+        max-width: 900px;
+        margin: 40px auto;
+        padding: 25px;
+        background: linear-gradient(135deg, #fff0f5, #ffe4e1); /* Pinkish gradient */
+        border-radius: 20px;
+        box-shadow: 0 12px 25px rgba(0,0,0,0.1);
+        text-align: center;
+        font-family: 'Arial', sans-serif;
+        position: relative;
+        overflow: hidden;
+        /* animation removed */
+    }
+
+    h2 {
+        color: #ff6f61; /* Coral color */
+        margin-bottom: 30px;
+        font-weight: 700;
+        letter-spacing: 1px;
+    }
+
+    /* Active Booking Message */
+    .active-booking {
+        padding: 15px 20px;
+        background: #fff3cd;
+        color: #856404;
+        border-radius: 10px;
+        font-weight: bold;
+        /* animation removed */
+    }
+
+    /* Ambulance List */
+    .ambulance-list {
+        list-style: none;
+        padding: 0;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 20px;
+    }
+
+    .ambulance-item {
+        background: linear-gradient(145deg, #f0fff0, #e0f7e0); /* Green pastel */
+        padding: 20px 25px;
+        border-radius: 15px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+        flex: 1 1 250px;
+        max-width: 280px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+        transition: transform 0.3s, box-shadow 0.3s;
+        position: relative;
+        overflow: hidden;
+        /* animation removed */
+    }
+
+    .ambulance-item:hover {
+        transform: translateY(-8px) rotate(-1deg);
+        box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+    }
+
+    .ambulance-item span {
+        font-weight: 600;
+        margin-bottom: 15px;
+        text-align: center;
+        color: #006400; /* Dark green */
+    }
+
+    /* Book Button */
+    .btn-success {
+        background-color: #ff8c00; /* Bright orange */
+        border: none;
+        padding: 10px 20px;
+        border-radius: 10px;
+        font-weight: 600;
+        color: white;
+        transition: all 0.3s;
+        cursor: pointer;
+    }
+
+    .btn-success:hover {
+        background-color: #ff7000;
+        transform: scale(1.1) rotate(-2deg);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .ambulance-list {
+            flex-direction: column;
+            align-items: center;
+        }
+        .ambulance-item {
+            width: 100%;
+            max-width: 90%;
+        }
+    }
+</style>
+
+<div class="container-ambulance">
     <h2>Available Ambulances</h2>
     {% if has_active_booking %}
-        <p>You have an active or pending booking. You cannot book another.</p>
+        <p class="active-booking">You have an active or pending booking. You cannot book another.</p>
     {% else %}
-        <ul>
+        <ul class="ambulance-list">
             {% for ambulance in ambulances %}
-                <li>Ambulance ID: {{ ambulance.id }} (Driver: {{ ambulance.driver.username }}) 
+                <li class="ambulance-item">
+                    <span>Ambulance ID: {{ ambulance.id }} <br> Driver: {{ ambulance.driver.username }}</span>
                     <a href="{{ url_for('book_ambulance', ambulance_id=ambulance.id) }}" class="btn btn-success">Book</a>
                 </li>
             {% endfor %}
         </ul>
     {% endif %}
+</div>
+
+<script>
+    // Background hover effect
+    const container = document.querySelector('.container-ambulance');
+    container.addEventListener('mouseenter', () => {
+        container.style.background = 'linear-gradient(135deg, #ffe6f0, #ffccd9)';
+    });
+    container.addEventListener('mouseleave', () => {
+        container.style.background = 'linear-gradient(135deg, #fff0f5, #ffe4e1)';
+    });
+
+    // Remove staggered animation (not needed anymore)
+</script>
+
 {% endblock %}

@@ -1,33 +1,130 @@
 {% extends "layout.html" %}
 {% block title %}Book Ambulance{% endblock %}
+
 {% block content %}
+<style>
+    /* Container Styling */
+    .booking-container {
+        max-width: 600px;
+        margin: 40px auto;
+        padding: 30px;
+        background: linear-gradient(145deg, #f9f9f9, #e9ecef);
+        border-radius: 20px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        font-family: 'Arial', sans-serif;
+        /* animation removed */
+    }
+
+    h2 {
+        color: #007bff;
+        text-align: center;
+        margin-bottom: 25px;
+        font-weight: 700;
+    }
+
+    /* Form Styling */
+    .form-group {
+        margin-bottom: 20px;
+        position: relative;
+        /* animation removed */
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 10px 15px;
+        border-radius: 8px;
+        border: 1px solid #ced4da;
+        font-size: 16px;
+        transition: all 0.3s;
+    }
+
+    .form-control:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 8px rgba(0,123,255,0.3);
+        outline: none;
+    }
+
+    /* Buttons */
+    .btn {
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s;
+        margin-top: 10px;
+        cursor: pointer;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border: none;
+        color: #fff;
+    }
+
+    .btn-primary:hover {
+        background-color: #0069d9;
+        transform: scale(1.05);
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        border: none;
+        color: #fff;
+        margin-right: 10px;
+    }
+
+    .btn-secondary:hover {
+        background-color: #5a6268;
+        transform: scale(1.05);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .booking-container {
+            padding: 20px;
+            margin: 20px;
+        }
+        .btn {
+            width: 100%;
+            margin-top: 10px;
+        }
+        .btn-secondary {
+            margin-right: 0;
+        }
+    }
+</style>
+
+<div class="booking-container">
     <h2>Book Ambulance ID: {{ ambulance.id }} (Driver: {{ ambulance.driver.username }})</h2>
     <form method="POST" id="bookingForm">
         {{ form.hidden_tag() }}
         <div class="form-group">
-            {{ form.patient_lat.label }} {{ form.patient_lat(class="form-control", id="patient_lat") }}
+            {{ form.patient_lat.label }} 
+            {{ form.patient_lat(class="form-control", id="patient_lat") }}
         </div>
         <div class="form-group">
-            {{ form.patient_lng.label }} {{ form.patient_lng(class="form-control", id="patient_lng") }}
+            {{ form.patient_lng.label }} 
+            {{ form.patient_lng(class="form-control", id="patient_lng") }}
         </div>
         <button type="button" class="btn btn-secondary" onclick="getCurrentLocation()">Use Current Location</button>
         {{ form.submit(class="btn btn-primary") }}
     </form>
-    <script>
-        function getCurrentLocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    function(position) {
-                        document.getElementById('patient_lat').value = position.coords.latitude;
-                        document.getElementById('patient_lng').value = position.coords.longitude;
-                    },
-                    function(error) {
-                        alert('Error getting location: ' + error.message);
-                    }
-                );
-            } else {
-                alert('Geolocation is not supported by this browser.');
-            }
+</div>
+
+<script>
+    function getCurrentLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    document.getElementById('patient_lat').value = position.coords.latitude;
+                    document.getElementById('patient_lng').value = position.coords.longitude;
+                },
+                function(error) {
+                    alert('Error getting location: ' + error.message);
+                }
+            );
+        } else {
+            alert('Geolocation is not supported by this browser.');
         }
-    </script>
+    }
+</script>
 {% endblock %}
