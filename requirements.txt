@@ -7,5 +7,3 @@ Werkzeug
 email-validator
 flask_wtf
 werkzeug
-flask
-gunicorn

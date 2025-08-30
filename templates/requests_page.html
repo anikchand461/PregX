@@ -1,109 +1,46 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>{% block title %}Ambulance App{% endblock %}</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-
-    <!-- Inline CSS -->
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #e3f2fd, #ffffff);
-            margin: 0;
-            padding: 0;
-        }
-        .navbar {
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-        }
-        .navbar:hover {
-            background-color: #f8f9fa !important;
-        }
-        .navbar-brand {
-            font-weight: bold;
-            color: #007bff !important;
-            font-size: 1.4rem;
-        }
-        .nav-link {
-            font-size: 1.1rem;
-            margin-left: 15px;
-            transition: 0.3s;
-        }
-        .nav-link:hover {
-            color: #0056b3 !important;
-            transform: scale(1.05);
-        }
-        .container {
-            margin-top: 30px;
-        }
-        .alert {
-            border-radius: 10px;
-            box-shadow: 0px 2px 6px rgba(0,0,0,0.1);
-            animation: fadeIn 0.8s ease-in-out;
-        }
-        @keyframes fadeIn {
-            from {opacity: 0; transform: translateY(-10px);}
-            to {opacity: 1; transform: translateY(0);}
-        }
-        footer {
-            margin-top: 50px;
-            text-align: center;
-            padding: 15px;
-            background: #f1f1f1;
-            border-radius: 8px;
-            color: #555;
-        }
-    </style>
-</head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="{{ url_for('index') }}">🚑 Ambulance App</a>
-        <div class="ml-auto">
-            {% if current_user.is_authenticated %}
-                <a class="nav-link d-inline-block" href="{{ url_for('logout') }}">Logout</a>
-            {% else %}
-                <a class="nav-link d-inline-block" href="{{ url_for('login') }}">Login</a>
-                <a class="nav-link d-inline-block" href="{{ url_for('register') }}">Register</a>
-            {% endif %}
+{% extends "layout.html" %}
+{% block title %}Requests Page{% endblock %}
+{% block content %}
+    <h2>Pending Requests</h2>
+    <ul>
+        {% for request in requests %}
+            <li>Booking ID: {{ request.id }} (Patient: {{ request.patient.username }}, Location: {{ request.patient_lat }}, {{ request.patient_lng }})
+                <form action="{{ url_for('confirm_booking', booking_id=request.id) }}" method="POST" style="display:inline;">
+                    <button type="submit" class="btn btn-success">Confirm</button>
+                </form>
+                <form action="{{ url_for('reject_booking', booking_id=request.id) }}" method="POST" style="display:inline;">
+                    <button type="submit" class="btn btn-danger">Reject</button>
+                </form>
+            </li>
+        {% endfor %}
+    </ul>
+    <h3>Update Your Location</h3>
+    <form method="POST" id="locationForm">
+        {{ update_form.hidden_tag() }}
+        <div class="form-group">
+            {{ update_form.lat.label }} {{ update_form.lat(class="form-control", id="driver_lat") }}
         </div>
-    </nav>
-
-    <div class="container">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ category }} mt-3">{{ message }}</div>
-                {% endfor %}
-            {% endif %}
-        {% endwith %}
-        {% block content %}{% endblock %}
-    </div>
-
-    <footer>
-        <p>© 2025 Ambulance App | Designed with ❤️ by Team</p>
-    </footer>
-
-    <!-- Inline JavaScript for interactivity -->
+        <div class="form-group">
+            {{ update_form.lng.label }} {{ update_form.lng(class="form-control", id="driver_lng") }}
+        </div>
+        <button type="button" class="btn btn-secondary" onclick="getCurrentLocation()">Use Current Location</button>
+        {{ update_form.submit(class="btn btn-primary") }}
+    </form>
     <script>
-        // Smooth alert dismissal
-        setTimeout(() => {
-            document.querySelectorAll('.alert').forEach(alert => {
-                alert.style.transition = "opacity 1s";
-                alert.style.opacity = "0";
-                setTimeout(() => alert.remove(), 1000);
-            });
-        }, 4000);
-
-        // Navbar scroll effect
-        window.addEventListener("scroll", function() {
-            const navbar = document.querySelector(".navbar");
-            if (window.scrollY > 50) {
-                navbar.style.boxShadow = "0 4px 12px rgba(0,0,0,0.2)";
+        function getCurrentLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        document.getElementById('driver_lat').value = position.coords.latitude;
+                        document.getElementById('driver_lng').value = position.coords.longitude;
+                    },
+                    function(error) {
+                        alert('Error getting location: ' + error.message);
+                    }
+                );
             } else {
-                navbar.style.boxShadow = "0 4px 8px rgba(0,0,0,0.1)";
+                alert('Geolocation is not supported by this browser.');
             }
-        });
+        }
     </script>
-</body>
-</html>
+{% endblock %}
