@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block title %}Ambulance Page{% endblock %}
+{% block content %}
+    <h2>Available Ambulances</h2>
+    {% if has_active_booking %}
+        <p>You have an active or pending booking. You cannot book another.</p>
+    {% else %}
+        <ul>
+            {% for ambulance in ambulances %}
+                <li>Ambulance ID: {{ ambulance.id }} (Driver: {{ ambulance.driver.username }}) 
+                    <a href="{{ url_for('book_ambulance', ambulance_id=ambulance.id) }}" class="btn btn-success">Book</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+{% block title %}Requests Page{% endblock %}
+{% block content %}
+    <h2>Pending Requests</h2>
+    <ul>
+        {% for request in requests %}
+            <li>Booking ID: {{ request.id }} (Patient: {{ request.patient.username }}, Location: {{ request.patient_lat }}, {{ request.patient_lng }})
+                <form action="{{ url_for('confirm_booking', booking_id=request.id) }}" method="POST" style="display:inline;">
+                    <button type="submit" class="btn btn-success">Confirm</button>
+                </form>
+                <form action="{{ url_for('reject_booking', booking_id=request.id) }}" method="POST" style="display:inline;">
+                    <button type="submit" class="btn btn-danger">Reject</button>
+                </form>
+            </li>
+        {% endfor %}
+    </ul>
+    <h3>Update Your Location</h3>
+    <form method="POST" id="locationForm">
+        {{ update_form.hidden_tag() }}
+        <div class="form-group">
+            {{ update_form.lat.label }} {{ update_form.lat(class="form-control", id="driver_lat") }}
+        </div>
+        <div class="form-group">
+            {{ update_form.lng.label }} {{ update_form.lng(class="form-control", id="driver_lng") }}
+        </div>
+        <button type="button" class="btn btn-secondary" onclick="getCurrentLocation()">Use Current Location</button>
+        {{ update_form.submit(class="btn btn-primary") }}
+    </form>
+    <script>
+        function getCurrentLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        document.getElementById('driver_lat').value = position.coords.latitude;
+                        document.getElementById('driver_lng').value = position.coords.longitude;
+                    },
+                    function(error) {
+                        alert('Error getting location: ' + error.message);
+                    }
+                );
+            } else {
+                alert('Geolocation is not supported by this browser.');
+            }
+        }
+    </script>
+{% endblock %}

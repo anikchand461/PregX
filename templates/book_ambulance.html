@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+{% block title %}Book Ambulance{% endblock %}
+{% block content %}
+    <h2>Book Ambulance ID: {{ ambulance.id }} (Driver: {{ ambulance.driver.username }})</h2>
+    <form method="POST" id="bookingForm">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            {{ form.patient_lat.label }} {{ form.patient_lat(class="form-control", id="patient_lat") }}
+        </div>
+        <div class="form-group">
+            {{ form.patient_lng.label }} {{ form.patient_lng(class="form-control", id="patient_lng") }}
+        </div>
+        <button type="button" class="btn btn-secondary" onclick="getCurrentLocation()">Use Current Location</button>
+        {{ form.submit(class="btn btn-primary") }}
+    </form>
+    <script>
+        function getCurrentLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    function(position) {
+                        document.getElementById('patient_lat').value = position.coords.latitude;
+                        document.getElementById('patient_lng').value = position.coords.longitude;
+                    },
+                    function(error) {
+                        alert('Error getting location: ' + error.message);
+                    }
+                );
+            } else {
+                alert('Geolocation is not supported by this browser.');
+            }
+        }
+    </script>
+{% endblock %}
