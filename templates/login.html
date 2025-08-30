@@ -6,10 +6,11 @@
 /* Container Styling */
 .login-container {
     max-width: 400px;
-    margin: 80px auto;
+    width: 90%;
+    margin: 8vh auto; /* smaller margin for smaller devices */
     padding: 40px 30px;
-    background: rgba(255,255,255,0.15); /* semi-transparent */
-    backdrop-filter: blur(15px); /* glass effect */
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(15px);
     border-radius: 25px;
     box-shadow: 0 15px 40px rgba(0,0,0,0.25);
     font-family: 'Arial', sans-serif;
@@ -27,26 +28,32 @@
     height: 200%;
     background: linear-gradient(45deg, #ff9a9e, #1d0690ff, #a18cd1, #ac1b83ff);
     background-size: 400% 400%;
-    z-index: 0; /* behind content */
+    animation: gradientBG 12s ease infinite;
+    z-index: 0;
     border-radius: 25px;
 }
 
-/* Ensure form content is above background */
+@keyframes gradientBG {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Form content */
 .login-container > * {
     position: relative;
     z-index: 1;
-    color: #fff; /* text visible */
+    color: #fff;
 }
 
-/* Heading Styling */
 h2 {
     text-align: center;
     margin-bottom: 30px;
     font-weight: 700;
+    font-size: 2rem;
     text-shadow: 2px 2px 8px rgba(0,0,0,0.5);
 }
 
-/* Form Styling */
 .form-group {
     margin-bottom: 20px;
 }
@@ -56,7 +63,7 @@ h2 {
     padding: 14px 18px;
     border-radius: 15px;
     border: none;
-    font-size: 16px;
+    font-size: 1rem;
     background: rgba(242, 242, 245, 0.9);
     color: #333;
     transition: all 0.3s ease;
@@ -67,7 +74,7 @@ h2 {
     outline: none;
 }
 
-/* Button Styling */
+/* Button */
 .btn-primary {
     width: 100%;
     padding: 14px;
@@ -75,9 +82,10 @@ h2 {
     font-weight: 600;
     background: linear-gradient(135deg, #6a11cb, #2575fc, #ff6a88);
     border: none;
-    color: #2f06b6ff;
-    font-size: 16px;
+    color: #fff;
+    font-size: 1rem;
     box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
 }
 
 .btn-primary:hover {
@@ -85,20 +93,51 @@ h2 {
     box-shadow: 0 12px 25px rgba(0,0,0,0.35);
 }
 
-/* Responsive */
+/* Responsive Tweaks */
 @media (max-width: 768px) {
     .login-container {
-        margin: 50px 20px;
-        padding: 30px 20px;
+        max-width: 90%;  /* prevent side overflow */
+        margin: 12vh auto;
+        padding: 25px 20px;
+        border-radius: 20px;
     }
 
     h2 {
-        font-size: 24px;
+        font-size: 1.6rem;
+    }
+
+    .form-control {
+        padding: 12px 15px;
+        font-size: 0.95rem;
     }
 
     .btn-primary {
         padding: 12px;
-        font-size: 14px;
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .login-container {
+        max-width: 95%;
+        margin: 10vh auto;
+        padding: 18px 12px;
+        border-radius: 15px;
+    }
+
+    h2 {
+        font-size: 1.3rem;
+        margin-bottom: 18px;
+    }
+
+    .form-control {
+        padding: 10px 12px;
+        font-size: 0.9rem;
+    }
+
+    .btn-primary {
+        padding: 10px;
+        font-size: 0.9rem;
     }
 }
 </style>
@@ -120,12 +159,11 @@ h2 {
 </div>
 
 <script>
-// Interactive Input Effects
-const inputs = document.querySelectorAll('.form-control');
-inputs.forEach(input => {
+// Smooth input focus animations
+document.querySelectorAll('.form-control').forEach(input => {
     input.addEventListener('focus', () => {
         input.style.transform = 'scale(1.02)';
-        input.style.boxShadow = '0 0 15px rgba(50, 62, 202, 0.7)';
+        input.style.boxShadow = '0 0 12px rgba(50, 62, 202, 0.6)';
     });
     input.addEventListener('blur', () => {
         input.style.transform = 'scale(1)';

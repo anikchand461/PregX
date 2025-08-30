@@ -219,11 +219,15 @@ async function sendMessage() {
   showTyping();
 
   try {
-    let response = await fetch("/chat", {
+    let response = await fetch("https://pregx.onrender.com/chat", {   // 👈 absolute URL
       method: "POST",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify({message: message})
     });
+
+    if (!response.ok) {
+      throw new Error("Server error " + response.status);
+    }
 
     let data = await response.json();
 
@@ -233,6 +237,7 @@ async function sendMessage() {
   } catch (err) {
     removeTyping();
     addMessage("⚠️ Error: Could not connect to server", "bot");
+    console.error("Chat fetch failed:", err);
   }
 }
 </script>

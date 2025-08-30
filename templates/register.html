@@ -8,22 +8,24 @@
         max-width: 500px;
         margin: 60px auto;
         padding: 35px 30px;
-        background: linear-gradient(145deg, #1e1f3f, #2e2f5f); /* Dark blue-purple gradient */
+        background: linear-gradient(145deg, #1e1f3f, #2e2f5f);
         border-radius: 20px;
         box-shadow: 0 12px 30px rgba(0,0,0,0.2);
         font-family: 'Arial', sans-serif;
         position: relative;
         overflow: hidden;
         animation: fadeIn 1s ease-in-out;
-        color: #ffffff; /* Text color changed to white */
+        color: #ffffff;
+        transition: all 0.3s ease-in-out;
     }
 
     h2 {
         text-align: center;
-        color: #ffffff; /* Text color changed to white */
+        color: #ffffff;
         margin-bottom: 30px;
         font-weight: 700;
         letter-spacing: 1px;
+        font-size: 1.8rem;
     }
 
     /* Form Styling */
@@ -32,19 +34,25 @@
         animation: slideUp 0.5s ease forwards;
     }
 
+    label {
+        font-size: 0.95rem;
+        margin-bottom: 6px;
+        display: inline-block;
+    }
+
     .form-control {
         width: 100%;
         padding: 12px 15px;
         border-radius: 8px;
         border: 1px solid #d2d2e1ff;
         background-color: #d7d7e4ff;
-        color: #0c0c0fff; /* Text color changed to white */
+        color: #0c0c0fff;
         font-size: 16px;
         transition: all 0.3s;
     }
 
     .form-control:focus {
-        border-color: #ffffff; /* Text color changed to white */
+        border-color: #ffffff;
         box-shadow: 0 0 10px rgba(255,255,255,0.3);
         outline: none;
         background-color: #e8e8f0ff;
@@ -59,8 +67,8 @@
         font-size: 16px;
         transition: all 0.3s;
         cursor: pointer;
-        background: linear-gradient(90deg, #6a5acd, #9370db); /* Purple gradient */
-        color: #ffffff; /* Text color changed to white */
+        background: linear-gradient(90deg, #6a5acd, #9370db);
+        color: #ffffff;
         border: none;
     }
 
@@ -81,6 +89,7 @@
     .floating-circle:nth-child(2) { width: 50px; height: 50px; top: 50%; left: -10px; background: #7b68ee; animation-delay: 2s; }
     .floating-circle:nth-child(3) { width: 100px; height: 100px; bottom: -30px; right: 15%; background: #9370db; animation-delay: 4s; }
 
+    /* Animations */
     @keyframes fadeIn {
         from {opacity: 0;}
         to {opacity: 1;}
@@ -96,11 +105,54 @@
         50% { transform: translateY(-20px); }
     }
 
-    /* Responsive */
+    /* ✅ Responsive Breakpoints */
+    @media (max-width: 1024px) {
+        .register-container {
+            max-width: 80%;
+            margin: 40px auto;
+            padding: 30px 25px;
+        }
+        h2 {
+            font-size: 1.6rem;
+        }
+    }
+
     @media (max-width: 768px) {
         .register-container {
-            margin: 40px 20px;
+            max-width: 90%;
+            margin: 30px auto;
             padding: 25px 20px;
+        }
+        h2 {
+            font-size: 1.4rem;
+        }
+        .form-control {
+            font-size: 15px;
+            padding: 10px 12px;
+        }
+        .btn-primary {
+            font-size: 15px;
+            padding: 10px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .register-container {
+            max-width: 95%;
+            margin: 20px auto;
+            padding: 20px 15px;
+            border-radius: 15px;
+        }
+        h2 {
+            font-size: 1.2rem;
+        }
+        .form-control {
+            font-size: 14px;
+            padding: 8px 10px;
+        }
+        .btn-primary {
+            font-size: 14px;
+            padding: 8px;
         }
     }
 </style>
