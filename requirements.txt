@@ -7,3 +7,13 @@ Werkzeug
 email-validator
 flask_wtf
 werkzeug
+python-dotenv
+langchain
+langchain-community
+langchain-google-genai
+chromadb
+fastapi
+jinja2
+python-multipart
+langchain-chroma
+faiss-cpu
