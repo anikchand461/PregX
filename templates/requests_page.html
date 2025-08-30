@@ -1,19 +1,154 @@
 {% extends "layout.html" %}
 {% block title %}Requests Page{% endblock %}
+
 {% block content %}
+<style>
+    /* Container Styling */
+    .requests-container {
+        max-width: 950px;
+        margin: 40px auto;
+        padding: 25px 30px;
+        background: linear-gradient(145deg, #f9f9f9, #e9ecef);
+        border-radius: 20px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        font-family: 'Arial', sans-serif;
+        animation: fadeIn 1s ease-in-out;
+    }
+
+    h2, h3 {
+        color: #007bff;
+        margin-bottom: 20px;
+        font-weight: 700;
+        text-align: center;
+    }
+
+    /* Request List */
+    .request-list {
+        list-style: none;
+        padding: 0;
+    }
+
+    .request-item {
+        background-color: #ffffff;
+        padding: 20px;
+        margin-bottom: 15px;
+        border-radius: 12px;
+        box-shadow: 0 6px 15px rgba(0,0,0,0.05);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        transition: transform 0.3s, box-shadow 0.3s;
+        animation: slideUp 0.5s ease forwards;
+    }
+
+    .request-item:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+
+    .request-info {
+        margin-bottom: 10px;
+        font-size: 16px;
+    }
+
+    /* Buttons */
+    .btn {
+        margin-left: 5px;
+        margin-top: 5px;
+        padding: 8px 18px;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: all 0.3s;
+        cursor: pointer;
+    }
+
+    .btn-success:hover {
+        background-color: #218838;
+        transform: scale(1.05);
+    }
+
+    .btn-danger:hover {
+        background-color: #c82333;
+        transform: scale(1.05);
+    }
+
+    .btn-secondary:hover {
+        background-color: #5a6268;
+        transform: scale(1.05);
+    }
+
+    .btn-primary:hover {
+        background-color: #0069d9;
+        transform: scale(1.05);
+    }
+
+    /* Form Styling */
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 10px 15px;
+        border-radius: 10px;
+        border: 1px solid #ced4da;
+        font-size: 16px;
+        transition: all 0.3s;
+    }
+
+    .form-control:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 10px rgba(0,123,255,0.3);
+        outline: none;
+    }
+
+    /* Animations */
+    @keyframes fadeIn {
+        from {opacity: 0;}
+        to {opacity: 1;}
+    }
+
+    @keyframes slideUp {
+        0% {opacity: 0; transform: translateY(20px);}
+        100% {opacity: 1; transform: translateY(0);}
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .request-item {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .btn {
+            width: 100%;
+            margin-left: 0;
+        }
+    }
+</style>
+
+<div class="requests-container">
     <h2>Pending Requests</h2>
-    <ul>
+    <ul class="request-list">
         {% for request in requests %}
-            <li>Booking ID: {{ request.id }} (Patient: {{ request.patient.username }}, Location: {{ request.patient_lat }}, {{ request.patient_lng }})
-                <form action="{{ url_for('confirm_booking', booking_id=request.id) }}" method="POST" style="display:inline;">
-                    <button type="submit" class="btn btn-success">Confirm</button>
-                </form>
-                <form action="{{ url_for('reject_booking', booking_id=request.id) }}" method="POST" style="display:inline;">
-                    <button type="submit" class="btn btn-danger">Reject</button>
-                </form>
+            <li class="request-item">
+                <div class="request-info">
+                    <strong>Booking ID:</strong> {{ request.id }} <br>
+                    <strong>Patient:</strong> {{ request.patient.username }} <br>
+                    <strong>Location:</strong> {{ request.patient_lat }}, {{ request.patient_lng }}
+                </div>
+                <div class="request-buttons">
+                    <form action="{{ url_for('confirm_booking', booking_id=request.id) }}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-success">Confirm</button>
+                    </form>
+                    <form action="{{ url_for('reject_booking', booking_id=request.id) }}" method="POST" style="display:inline;">
+                        <button type="submit" class="btn btn-danger">Reject</button>
+                    </form>
+                </div>
             </li>
         {% endfor %}
     </ul>
+
     <h3>Update Your Location</h3>
     <form method="POST" id="locationForm">
         {{ update_form.hidden_tag() }}
@@ -23,24 +158,34 @@
         <div class="form-group">
             {{ update_form.lng.label }} {{ update_form.lng(class="form-control", id="driver_lng") }}
         </div>
-        <button type="button" class="btn btn-secondary" onclick="getCurrentLocation()">Use Current Location</button>
+        <button type="button" class="btn btn-secondary" id="useLocationBtn">Use Current Location</button>
         {{ update_form.submit(class="btn btn-primary") }}
     </form>
-    <script>
-        function getCurrentLocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    function(position) {
-                        document.getElementById('driver_lat').value = position.coords.latitude;
-                        document.getElementById('driver_lng').value = position.coords.longitude;
-                    },
-                    function(error) {
-                        alert('Error getting location: ' + error.message);
-                    }
-                );
-            } else {
-                alert('Geolocation is not supported by this browser.');
-            }
+</div>
+
+<script>
+    // Smooth fade-in for container
+    document.addEventListener('DOMContentLoaded', () => {
+        const container = document.querySelector('.requests-container');
+        container.style.opacity = 0;
+        setTimeout(() => { container.style.opacity = 1; }, 50);
+    });
+
+    // Get current location and fill form
+    document.getElementById('useLocationBtn').addEventListener('click', function() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    document.getElementById('driver_lat').value = position.coords.latitude;
+                    document.getElementById('driver_lng').value = position.coords.longitude;
+                },
+                function(error) {
+                    alert('Error getting location: ' + error.message);
+                }
+            );
+        } else {
+            alert('Geolocation is not supported by this browser.');
         }
-    </script>
+    });
+</script>
 {% endblock %}
