@@ -1,24 +1,116 @@
 {% extends "layout.html" %}
 {% block title %}Register{% endblock %}
 {% block content %}
-    <h2>Register</h2>
-    <form method="POST">
-        {{ form.hidden_tag() }}
-        <div class="form-group">
-            {{ form.username.label }} {{ form.username(class="form-control") }}
+<style>
+    body {
+        background: linear-gradient(135deg, #ff9966, #ff5e62);
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        min-height: 100vh;
+        margin: 0;
+    }
+
+    /* Wrapper to center the register form */
+    .register-wrapper {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: calc(100vh - 80px); /* leaves space for header */
+        padding: 20px;
+    }
+
+    .register-container {
+        width: 100%;
+        max-width: 500px;
+    }
+
+    .register-card {
+        border-radius: 20px;
+        background: #fff;
+        padding: 25px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        animation: fadeIn 0.6s ease-in-out;
+    }
+
+    .form-control {
+        border-radius: 10px;
+        border: 1px solid #ccc;
+        padding: 12px;
+        font-size: 16px;
+    }
+
+    .form-control:focus {
+        border-color: #ff5e62;
+        box-shadow: 0 0 8px rgba(255,94,98,0.4);
+    }
+
+    .btn-primary {
+        border-radius: 12px;
+        font-weight: bold;
+        transition: all 0.3s ease-in-out;
+        background-color: #ff5e62 !important;
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background-color: #e54b50 !important;
+        transform: scale(1.03);
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-15px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 576px) {
+        .register-card { padding: 20px; }
+        h2 { font-size: 1.6rem; }
+    }
+</style>
+
+<div class="register-wrapper">
+    <div class="register-container">
+        <div class="card register-card">
+            <div class="card-body">
+                <h2 class="text-center mb-4">Register</h2>
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    <div class="form-group mb-3">
+                        {{ form.username.label(class="form-label") }}
+                        {{ form.username(class="form-control form-control-lg", placeholder="Choose a username") }}
+                    </div>
+                    <div class="form-group mb-3">
+                        {{ form.email.label(class="form-label") }}
+                        {{ form.email(class="form-control form-control-lg", placeholder="Enter your email") }}
+                    </div>
+                    <div class="form-group mb-3">
+                        {{ form.password.label(class="form-label") }}
+                        {{ form.password(class="form-control form-control-lg", placeholder="Enter password") }}
+                    </div>
+                    <div class="form-group mb-3">
+                        {{ form.confirm_password.label(class="form-label") }}
+                        {{ form.confirm_password(class="form-control form-control-lg", placeholder="Confirm password") }}
+                    </div>
+                    <div class="form-group mb-4">
+                        {{ form.user_type.label(class="form-label") }}
+                        {{ form.user_type(class="form-control form-control-lg") }}
+                    </div>
+                    <div class="d-grid">
+                        {{ form.submit(class="btn btn-primary btn-lg") }}
+                    </div>
+                </form>
+            </div>
         </div>
-        <div class="form-group">
-            {{ form.email.label }} {{ form.email(class="form-control") }}
-        </div>
-        <div class="form-group">
-            {{ form.password.label }} {{ form.password(class="form-control") }}
-        </div>
-        <div class="form-group">
-            {{ form.confirm_password.label }} {{ form.confirm_password(class="form-control") }}
-        </div>
-        <div class="form-group">
-            {{ form.user_type.label }} {{ form.user_type(class="form-control") }}
-        </div>
-        {{ form.submit(class="btn btn-primary") }}
-    </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const btn = document.querySelector(".btn-primary");
+        if (btn) {
+            btn.addEventListener("click", () => {
+                btn.innerHTML = "Registering...";
+            });
+        }
+    });
+</script>
 {% endblock %}

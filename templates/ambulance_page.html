@@ -1,16 +1,100 @@
 {% extends "layout.html" %}
 {% block title %}Ambulance Page{% endblock %}
+
 {% block content %}
-    <h2>Available Ambulances</h2>
+<style>
+    .ambulance-container {
+        max-width: 800px;
+        margin: 30px auto;
+        padding: 25px;
+        background: #ffffff;
+        border-radius: 15px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+
+    .ambulance-container h2 {
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: 20px;
+        color: #2c3e50;
+    }
+
+    .status-msg {
+        background: #ffeaa7;
+        padding: 15px;
+        border-radius: 10px;
+        font-weight: 500;
+        margin-bottom: 20px;
+        color: #d35400;
+    }
+
+    .ambulance-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .ambulance-card {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #f8f9fa;
+        padding: 15px 20px;
+        margin-bottom: 15px;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        border: 1px solid #e0e0e0;
+    }
+
+    .ambulance-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+    }
+
+    .ambulance-info {
+        text-align: left;
+    }
+
+    .ambulance-info h5 {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 600;
+        color: #34495e;
+    }
+
+    .ambulance-info p {
+        margin: 2px 0 0;
+        color: #7f8c8d;
+    }
+
+    .btn-book {
+        padding: 8px 15px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+    }
+</style>
+
+<div class="ambulance-container">
+    <h2>🚑 Available Ambulances</h2>
+
     {% if has_active_booking %}
-        <p>You have an active or pending booking. You cannot book another.</p>
+        <p class="status-msg">⚠️ You already have an active or pending booking. Please wait before booking another.</p>
     {% else %}
-        <ul>
+        <ul class="ambulance-list">
             {% for ambulance in ambulances %}
-                <li>Ambulance ID: {{ ambulance.id }} (Driver: {{ ambulance.driver.username }}) 
-                    <a href="{{ url_for('book_ambulance', ambulance_id=ambulance.id) }}" class="btn btn-success">Book</a>
+                <li class="ambulance-card">
+                    <div class="ambulance-info">
+                        <h5>Ambulance ID: {{ ambulance.id }}</h5>
+                        <p>Driver: {{ ambulance.driver.username }}</p>
+                    </div>
+                    <a href="{{ url_for('book_ambulance', ambulance_id=ambulance.id) }}" class="btn btn-success btn-book">
+                        Book Now
+                    </a>
                 </li>
             {% endfor %}
         </ul>
     {% endif %}
+</div>
 {% endblock %}
