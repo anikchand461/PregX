@@ -34,26 +34,6 @@ def index():
     return redirect(url_for('login'))
 
 
-@app.route('/api/chat', methods=['POST'])
-@login_required
-def api_chat():
-    payload = request.get_json(silent=True) or {}
-    query = payload.get('message', '')
-
-    if not query:
-        return jsonify({"status": "error", "answer": "Please provide a message."}), 400
-
-    # Use HealthMateChatbot to get the response
-    answer = chatbot.get_response(query)
-
-    response = {
-        "status": "ok",
-        "question": query,
-        "answer": answer
-    }
-    return jsonify(response), 200
-
-
 @app.route('/services')
 def services():
     return render_template('services_quickcare.html')
@@ -290,18 +270,21 @@ def map(booking_id):
 
 # --- Added placeholder API endpoint to satisfy url_for('api_chat') or client requests ---
 @app.route('/api/chat', methods=['POST'])
+@login_required
 def api_chat():
-    """
-    Placeholder API endpoint — many templates/JS call url_for('api_chat').
-    Replace body with your chat logic (or remove route and update templates).
-    """
     payload = request.get_json(silent=True) or {}
-    # Example: echo back the message (or implement your logic)
-    message = payload.get('message', '')
+    query = payload.get('message', '')
+
+    if not query:
+        return jsonify({"status": "error", "answer": "Please provide a message."}), 400
+
+    # Use HealthMateChatbot to get the response
+    answer = chatbot.get_response(query)
+
     response = {
         "status": "ok",
-        "received": message,
-        "note": "This is a placeholder response from api_chat. Implement real logic here."
+        "question": query,
+        "answer": answer
     }
     return jsonify(response), 200
 
