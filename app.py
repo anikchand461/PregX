@@ -277,10 +277,14 @@ def map(booking_id):
 # --- Chatbot API endpoint ---
 @app.route('/api/chat', methods=['POST'])
 def api_chat():
-    data = request.get_json()
-    message = data.get("message", "")
-    # process message
-    return jsonify({"reply": f"You said: {message}"})
+    payload = request.get_json(silent=True) or {}
+    message = payload.get("message", "").strip()
+
+    if not message:
+        return jsonify({"status": "error", "response": "Please provide a message."}), 400
+
+    response_text = chatbot.get_response(message)
+    return jsonify({"status": "ok", "response": response_text}), 200
 
 if __name__ == '__main__':
     with app.app_context():
