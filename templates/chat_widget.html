@@ -222,11 +222,8 @@ function removeTyping() {
     const typingDiv = document.getElementById("typing");
     if (typingDiv) typingDiv.remove();
 }
-
-const apiChatUrl = "https://pregx.onrender.com/api/chat";
-// Flask API URL (match your route function name)
-// Flask API URL (absolute path since widget is static)
-
+const apiChatUrl = "https://pregx.onrender.com/api/chat"; 
+// For local dev: "http://127.0.0.1:5000/api/chat"
 
 // Send message function
 async function sendMessage() {
@@ -245,27 +242,34 @@ async function sendMessage() {
             body: JSON.stringify({ message: message })
         });
 
-        if (!response.ok) {
-            throw new Error("Server error " + response.status);
+        let data;
+        try {
+            data = await response.json();
+        } catch (parseErr) {
+            throw new Error("Invalid JSON response");
         }
 
-        let data = await response.json();
         removeTyping();
-        // your API returns {status, received, note}
-        // so show data.received instead of data.response
+
+        if (!response.ok) {
+            addMessage(`⚠️ Server error ${response.status}: ${data.response || "Unknown error"}`, "bot");
+            return;
+        }
+
+        // API returns { status, response }
         addMessage(data.response || "No response", "bot");
+
     } catch (err) {
         removeTyping();
-        addMessage("⚠️ Error: Could not connect to server", "bot");
+        addMessage("⚠️ Could not connect to server. Please try again later.", "bot");
         console.error("Chat fetch failed:", err);
     }
 }
 
 // Enter key functionality
 inputField.addEventListener("keydown", function(event) {
-    if (event.key === "Enter" && !event.shiftKey) { // Enter sends message
+    if (event.key === "Enter" && !event.shiftKey) { 
         event.preventDefault();
         sendMessage();
     }
 });
-</script>
