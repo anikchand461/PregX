@@ -5,6 +5,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User, Ambulance, Booking
 from forms import RegistrationForm, LoginForm, BookAmbulanceForm, UpdateLocationForm
 from datetime import datetime
+from chat import HealthMateChatbot
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key_here'  # Change this to a random secret key in production
@@ -16,6 +17,7 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
+chatbot = HealthMateChatbot()
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -30,6 +32,26 @@ def index():
         else:
             return redirect(url_for('requests_page'))
     return redirect(url_for('login'))
+
+
+@app.route('/api/chat', methods=['POST'])
+@login_required
+def api_chat():
+    payload = request.get_json(silent=True) or {}
+    query = payload.get('message', '')
+
+    if not query:
+        return jsonify({"status": "error", "answer": "Please provide a message."}), 400
+
+    # Use HealthMateChatbot to get the response
+    answer = chatbot.get_response(query)
+
+    response = {
+        "status": "ok",
+        "question": query,
+        "answer": answer
+    }
+    return jsonify(response), 200
 
 
 @app.route('/services')
