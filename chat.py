@@ -111,3 +111,4 @@ class HealthMateChatbot:
         self.chat_history.append((query, answer))
 
         return answer
+    #...
