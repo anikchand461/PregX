@@ -1,0 +1,119 @@
+{% extends "layout_quickcare.html" %}
+{% block title %}About QuickCare{% endblock %}
+
+{% block content %}
+<div class="about-container">
+    <h1 class="about-title">About QuickCare</h1>
+    <p class="about-subtitle">Revolutionizing emergency medical services through technology and compassionate care.</p>
+    
+    <div class="about-content">
+        <div class="about-text">
+            <h2 class="mission-title">Our Mission</h2>
+            <p class="mission-text">
+                At QuickCare, our mission is to provide rapid, reliable, and professional emergency medical services to those in need. We believe that everyone deserves access to quality healthcare, especially during critical moments when time matters most.
+            </p>
+            <p class="mission-text">
+                Through innovative technology and a network of dedicated healthcare professionals, we aim to bridge the gap between patients and emergency medical care, ensuring that help is always just a tap away.
+            </p>
+        </div>
+        
+        <div class="about-image">
+            <img src="https://images.unsplash.com/photo-1516574187841-cb9cc2ca948b?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="Medical Equipment" />
+        </div>
+    </div>
+    
+    <div class="about-values">
+        <h2 class="values-title">Our Core Values</h2>
+        
+        <div class="values-grid">
+            <div class="value-card">
+                <div class="value-icon">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#ff6b6b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M12 6V12L16 14" stroke="#ff6b6b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <h3>Speed</h3>
+                <p>We understand that in emergencies, every second counts. Our rapid response system ensures help arrives as quickly as possible.</p>
+            </div>
+            
+            <div class="value-card">
+                <div class="value-icon">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M22 11.08V12C21.9988 14.1564 21.3005 16.2547 20.0093 17.9818C18.7182 19.709 16.9033 20.9725 14.8354 21.5839C12.7674 22.1953 10.5573 22.1219 8.53447 21.3746C6.51168 20.6273 4.78465 19.2461 3.61096 17.4371C2.43727 15.628 1.87979 13.4881 2.02168 11.3363C2.16356 9.18455 2.99721 7.13631 4.39828 5.49706C5.79935 3.85781 7.69279 2.71537 9.79619 2.24013C11.8996 1.7649 14.1003 1.98232 16.07 2.85999" stroke="#ff6b6b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M22 4L12 14.01L9 11.01" stroke="#ff6b6b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <h3>Quality</h3>
+                <p>We never compromise on the quality of care. Our ambulances are equipped with state-of-the-art medical equipment and staffed by certified professionals.</p>
+            </div>
+            
+            <div class="value-card">
+                <div class="value-icon">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20.84 4.61C20.3292 4.099 19.7228 3.69364 19.0554 3.41708C18.3879 3.14052 17.6725 2.99817 16.95 2.99817C16.2275 2.99817 15.5121 3.14052 14.8446 3.41708C14.1772 3.69364 13.5708 4.099 13.06 4.61L12 5.67L10.94 4.61C9.9083 3.57831 8.50903 2.99871 7.05 2.99871C5.59096 2.99871 4.19169 3.57831 3.16 4.61C2.1283 5.64169 1.54871 7.04097 1.54871 8.5C1.54871 9.95903 2.1283 11.3583 3.16 12.39L12 21.23L20.84 12.39C21.351 11.8792 21.7563 11.2728 22.0329 10.6054C22.3095 9.93789 22.4518 9.22248 22.4518 8.5C22.4518 7.77752 22.3095 7.0621 22.0329 6.39464C21.7563 5.72718 21.351 5.12075 20.84 4.61V4.61Z" stroke="#ff6b6b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <h3>Compassion</h3>
+                <p>We treat every patient with dignity, respect, and empathy. Our team is trained to provide not just medical care, but emotional support during difficult times.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .about-values {
+        margin-top: 50px;
+    }
+    
+    .values-title {
+        text-align: center;
+        margin-bottom: 30px;
+        font-size: 28px;
+        color: #333;
+    }
+    
+    .values-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 30px;
+        margin-top: 30px;
+    }
+    
+    .value-card {
+        background-color: #fff;
+        border-radius: 10px;
+        padding: 25px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        text-align: center;
+    }
+    
+    .value-icon {
+        width: 70px;
+        height: 70px;
+        margin: 0 auto 20px;
+        background-color: #fff0f0;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .value-card h3 {
+        margin-bottom: 15px;
+        color: #333;
+        font-size: 20px;
+    }
+    
+    .value-card p {
+        color: #666;
+        line-height: 1.6;
+    }
+    
+    @media (max-width: 768px) {
+        .values-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}

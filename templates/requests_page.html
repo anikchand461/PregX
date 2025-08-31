@@ -1,18 +1,18 @@
-{% extends "layout.html" %}
+{% extends "layout_quickcare.html" %}
 {% block title %}Requests Page{% endblock %}
 
 {% block content %}
 <style>
     /* Container Styling */
     .requests-container {
-        max-width: 1000px;
-        margin: 20px auto;
-        padding: 20px;
+        max-width: 950px;
+        margin: 40px auto;
+        padding: 25px 30px;
         background: linear-gradient(145deg, #f9f9f9, #e9ecef);
         border-radius: 20px;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
         font-family: 'Arial', sans-serif;
-        animation: fadeIn 0.8s ease-in-out;
+        animation: fadeIn 1s ease-in-out;
     }
 
     h2, h3 {
@@ -26,7 +26,6 @@
     .request-list {
         list-style: none;
         padding: 0;
-        margin: 0;
     }
 
     .request-item {
@@ -37,46 +36,52 @@
         box-shadow: 0 6px 15px rgba(0,0,0,0.05);
         display: flex;
         justify-content: space-between;
-        align-items: flex-start;
+        align-items: center;
         flex-wrap: wrap;
-        gap: 15px;
         transition: transform 0.3s, box-shadow 0.3s;
-        animation: slideUp 0.4s ease forwards;
+        animation: slideUp 0.5s ease forwards;
     }
 
     .request-item:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
     }
 
     .request-info {
-        flex: 1;
-        min-width: 230px;
+        margin-bottom: 10px;
         font-size: 16px;
-        word-break: break-word;
     }
 
     /* Buttons */
-    .request-buttons {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 10px;
-    }
-
     .btn {
-        padding: 10px 18px;
+        margin-left: 5px;
+        margin-top: 5px;
+        padding: 8px 18px;
         border-radius: 10px;
         font-weight: 600;
         transition: all 0.3s;
         cursor: pointer;
-        flex: 1 1 auto;
-        text-align: center;
     }
 
-    .btn-success:hover { background-color: #218838; transform: scale(1.05); }
-    .btn-danger:hover { background-color: #c82333; transform: scale(1.05); }
-    .btn-secondary:hover { background-color: #5a6268; transform: scale(1.05); }
-    .btn-primary:hover { background-color: #0069d9; transform: scale(1.05); }
+    .btn-success:hover {
+        background-color: #218838;
+        transform: scale(1.05);
+    }
+
+    .btn-danger:hover {
+        background-color: #c82333;
+        transform: scale(1.05);
+    }
+
+    .btn-secondary:hover {
+        background-color: #5a6268;
+        transform: scale(1.05);
+    }
+
+    .btn-primary:hover {
+        background-color: #0069d9;
+        transform: scale(1.05);
+    }
 
     /* Form Styling */
     .form-group {
@@ -85,7 +90,7 @@
 
     .form-control {
         width: 100%;
-        padding: 10px 14px;
+        padding: 10px 15px;
         border-radius: 10px;
         border: 1px solid #ced4da;
         font-size: 16px;
@@ -109,28 +114,16 @@
         100% {opacity: 1; transform: translateY(0);}
     }
 
-    /* 🔹 Responsive Breakpoints */
-    @media (max-width: 1024px) {
-        .requests-container { padding: 15px; }
-    }
-
+    /* Responsive */
     @media (max-width: 768px) {
         .request-item {
             flex-direction: column;
-            align-items: stretch;
-        }
-        .request-buttons {
-            width: 100%;
+            align-items: flex-start;
         }
         .btn {
-            flex: 1 1 100%;
+            width: 100%;
+            margin-left: 0;
         }
-    }
-
-    @media (max-width: 480px) {
-        h2, h3 { font-size: 20px; }
-        .request-info { font-size: 14px; }
-        .btn { font-size: 14px; padding: 8px 14px; }
     }
 </style>
 
@@ -145,10 +138,10 @@
                     <strong>Location:</strong> {{ request.patient_lat }}, {{ request.patient_lng }}
                 </div>
                 <div class="request-buttons">
-                    <form action="{{ url_for('confirm_booking', booking_id=request.id) }}" method="POST" style="flex:1;">
+                    <form action="{{ url_for('confirm_booking', booking_id=request.id) }}" method="POST" style="display:inline;">
                         <button type="submit" class="btn btn-success">Confirm</button>
                     </form>
-                    <form action="{{ url_for('reject_booking', booking_id=request.id) }}" method="POST" style="flex:1;">
+                    <form action="{{ url_for('reject_booking', booking_id=request.id) }}" method="POST" style="display:inline;">
                         <button type="submit" class="btn btn-danger">Reject</button>
                     </form>
                 </div>
@@ -195,5 +188,4 @@
         }
     });
 </script>
-{% include "chat_widget.html" %}
 {% endblock %}

@@ -1,11 +1,10 @@
-from flask import Flask, render_template, redirect, url_for, flash, request, jsonify
+from flask import Flask, render_template, redirect, url_for, flash, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_user, current_user, logout_user, login_required
 from werkzeug.security import generate_password_hash, check_password_hash
-from models import db, User, Ambulance, Booking, Message
+from models import db, User, Ambulance, Booking
 from forms import RegistrationForm, LoginForm, BookAmbulanceForm, UpdateLocationForm
 from datetime import datetime
-from chat import HealthMateChatbot
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key_here'  # Change this to a random secret key
@@ -16,8 +15,6 @@ db.init_app(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
-
-chatbot = HealthMateChatbot()
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -32,33 +29,13 @@ def index():
             return redirect(url_for('requests_page'))
     return redirect(url_for('login'))
 
-@app.route("/chat", methods=["POST"])
-@login_required
-def chat():
-    user_msg = request.json.get("message")
+@app.route('/services')
+def services():
+    return render_template('services_quickcare.html')
 
-    # Save user message
-    user_message = Message(
-        user_id=current_user.id,
-        sender="user",
-        content=user_msg
-    )
-    db.session.add(user_message)
-
-    # Get bot response
-    response = chatbot.get_response(user_msg)
-
-    # Save bot message
-    bot_message = Message(
-        user_id=current_user.id,
-        sender="bot",
-        content=response
-    )
-    db.session.add(bot_message)
-
-    db.session.commit()
-
-    return jsonify({"response": response})
+@app.route('/about')
+def about():
+    return render_template('about_quickcare.html')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -74,7 +51,7 @@ def register():
             db.session.commit()
         flash('Registration successful! Please log in.', 'success')
         return redirect(url_for('login'))
-    return render_template('register.html', form=form)
+    return render_template('register_quickcare.html', form=form)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -90,7 +67,7 @@ def login():
                 return redirect(url_for('requests_page'))
         else:
             flash('Login failed. Check your email and password.', 'danger')
-    return render_template('login.html', form=form)
+    return render_template('login_quickcare.html', form=form)
 
 @app.route('/logout')
 @login_required
