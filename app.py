@@ -6,6 +6,7 @@ from models import db, User, Ambulance, Booking
 from forms import RegistrationForm, LoginForm, BookAmbulanceForm, UpdateLocationForm
 from datetime import datetime
 from chat import HealthMateChatbot
+from flask_cors import CORS
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key_here'  # Change this to a random secret key in production
@@ -17,7 +18,11 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
+# Initialize the chatbot
 chatbot = HealthMateChatbot()
+
+CORS(app, resources={r"/api/*": {"origins": "*"}})
+
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -268,25 +273,17 @@ def map(booking_id):
     )
 
 
-# --- Added placeholder API endpoint to satisfy url_for('api_chat') or client requests ---
+# --- Chatbot API endpoint ---
 @app.route('/api/chat', methods=['POST'])
 def api_chat():
     payload = request.get_json(silent=True) or {}
-    query = payload.get('message', '')
+    message = payload.get("message", "").strip()
 
-    if not query:
-        return jsonify({"status": "error", "answer": "Please provide a message."}), 400
+    if not message:
+        return jsonify({"status": "error", "response": "Please provide a message."}), 400
 
-    # Use HealthMateChatbot to get the response
-    answer = chatbot.get_response(query)
-
-    response = {
-        "status": "ok",
-        "question": query,
-        "answer": answer
-    }
-    return jsonify(response), 200
-
+    response_text = chatbot.get_response(message)
+    return jsonify({"status": "ok", "response": response_text}), 200
 
 if __name__ == '__main__':
     with app.app_context():
