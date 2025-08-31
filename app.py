@@ -7,6 +7,7 @@ from forms import RegistrationForm, LoginForm, BookAmbulanceForm, UpdateLocation
 from datetime import datetime
 from chat import HealthMateChatbot
 from flask_cors import CORS
+import os
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key_here'  # Change this to a random secret key in production
@@ -289,4 +290,9 @@ if __name__ == '__main__':
     with app.app_context():
         # create tables if missing
         db.create_all()
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(debug=True, host="0.0.0.0", port=port)
+    
+# if __name__ == "__main__":
+#     port = int(os.environ.get("PORT", 5000))
+#     app.run(host="0.0.0.0", port=port)
