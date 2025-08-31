@@ -1,116 +1,84 @@
-{% extends "layout.html" %}
+{% extends "layout_quickcare.html" %}
 {% block title %}Map{% endblock %}
 {% block content %}
-<style>
-/* Container adjustments */
-#map {
-    height: 80vh;   /* Flexible height */
-    width: 100%;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-    margin-bottom: 20px;
-}
+    <h2>Live Map</h2>
+    <div id="map" style="height: 500px;"></div>
 
-/* Page title */
-h2 {
-    text-align: center;
-    margin: 20px 0;
-    font-size: 28px;
-    font-weight: 700;
-    color: #333;
-}
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
 
-/* Responsive */
-@media (max-width: 768px) {
-    h2 {
-        font-size: 22px;
-    }
-    #map {
-        height: 65vh;  /* smaller but usable on mobile */
-    }
-}
-</style>
+    <script>
+        var map = L.map('map').setView([{{ patient_lat }}, {{ patient_lng }}], 13);
 
-<h2>🚑 Live Map</h2>
-<div id="map"></div>
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-<!-- Leaflet CSS & JS -->
-<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+        // Patient marker
+        var patientMarker = L.marker([{{ patient_lat }}, {{ patient_lng }}])
+            .addTo(map)
+            .bindPopup('Patient Location');
 
-<script>
-    var map = L.map('map').setView([{{ patient_lat }}, {{ patient_lng }}], 13);
+        // Driver marker
+        var driverMarker = L.marker([{{ driver_lat }}, {{ driver_lng }}])
+            .addTo(map)
+            .bindPopup('Driver Location');
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        // Draw route between driver and patient
+        L.Routing.control({
+            waypoints: [
+                L.latLng({{ driver_lat }}, {{ driver_lng }}),
+                L.latLng({{ patient_lat }}, {{ patient_lng }})
+            ],
+            routeWhileDragging: false,
+            addWaypoints: false,
+            draggableWaypoints: false,
+            createMarker: function() { return null; } // hide default markers
+        }).addTo(map);
 
-    // Patient marker
-    var patientMarker = L.marker([{{ patient_lat }}, {{ patient_lng }}])
-        .addTo(map)
-        .bindPopup('🏥 Patient Location');
+        // 🔹 Fetch nearby hospitals (up to 20)
+        var overpassUrl = "https://overpass-api.de/api/interpreter";
+        var query = `
+            [out:json];
+            (
+              node["amenity"="hospital"](around:5000, {{ patient_lat }}, {{ patient_lng }});
+              way["amenity"="hospital"](around:5000, {{ patient_lat }}, {{ patient_lng }});
+              relation["amenity"="hospital"](around:5000, {{ patient_lat }}, {{ patient_lng }});
+            );
+            out center 20;
+        `;
 
-    // Driver marker
-    var driverMarker = L.marker([{{ driver_lat }}, {{ driver_lng }}])
-        .addTo(map)
-        .bindPopup('🚗 Driver Location');
+        fetch(overpassUrl, { method: "POST", body: query })
+        .then(response => response.json())
+        .then(data => {
+            data.elements.forEach(function(element, index) {
+                var lat = element.lat || element.center.lat;
+                var lon = element.lon || element.center.lon;
+                var name = element.tags.name || "Hospital " + (index+1);
 
-    // Route between driver & patient
-    L.Routing.control({
-        waypoints: [
-            L.latLng({{ driver_lat }}, {{ driver_lng }}),
-            L.latLng({{ patient_lat }}, {{ patient_lng }})
-        ],
-        routeWhileDragging: false,
-        addWaypoints: false,
-        draggableWaypoints: false,
-        createMarker: function() { return null; }
-    }).addTo(map);
+                // Add hospital marker
+                var hospitalMarker = L.marker([lat, lon], {
+                    icon: L.icon({
+                        iconUrl: 'https://cdn-icons-png.flaticon.com/512/854/854878.png',
+                        iconSize: [25, 25]
+                    })
+                }).addTo(map).bindPopup("<b>" + name + "</b>");
 
-    // Nearby hospitals
-    var overpassUrl = "https://overpass-api.de/api/interpreter";
-    var query = `
-        [out:json];
-        (
-          node["amenity"="hospital"](around:5000, {{ patient_lat }}, {{ patient_lng }});
-          way["amenity"="hospital"](around:5000, {{ patient_lat }}, {{ patient_lng }});
-          relation["amenity"="hospital"](around:5000, {{ patient_lat }}, {{ patient_lng }});
-        );
-        out center 20;
-    `;
-
-    fetch(overpassUrl, { method: "POST", body: query })
-    .then(response => response.json())
-    .then(data => {
-        data.elements.forEach(function(element, index) {
-            var lat = element.lat || element.center.lat;
-            var lon = element.lon || element.center.lon;
-            var name = element.tags.name || "Hospital " + (index+1);
-
-            var hospitalMarker = L.marker([lat, lon], {
-                icon: L.icon({
-                    iconUrl: 'https://cdn-icons-png.flaticon.com/512/854/854878.png',
-                    iconSize: [25, 25]
-                })
-            }).addTo(map).bindPopup("<b>" + name + "</b>");
-
-            // Route from patient → hospital
-            L.Routing.control({
-                waypoints: [
-                    L.latLng({{ patient_lat }}, {{ patient_lng }}),
-                    L.latLng(lat, lon)
-                ],
-                lineOptions: {
-                    styles: [{ color: 'red', opacity: 0.6, weight: 3 }]
-                },
-                routeWhileDragging: false,
-                addWaypoints: false,
-                draggableWaypoints: false,
-                createMarker: function() { return null; }
-            }).addTo(map);
-        });
-    })
-    .catch(err => console.error(err));
-</script>
-
-{% include "chat_widget.html" %}
+                // Draw route from patient → hospital
+                L.Routing.control({
+                    waypoints: [
+                        L.latLng({{ patient_lat }}, {{ patient_lng }}),
+                        L.latLng(lat, lon)
+                    ],
+                    lineOptions: {
+                        styles: [{ color: 'red', opacity: 0.6, weight: 3 }]
+                    },
+                    routeWhileDragging: false,
+                    addWaypoints: false,
+                    draggableWaypoints: false,
+                    createMarker: function() { return null; } // hide routing markers
+                }).addTo(map);
+            });
+        })
+        .catch(err => console.error(err));
+    </script>
 {% endblock %}
