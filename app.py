@@ -270,7 +270,6 @@ def map(booking_id):
 
 # --- Added placeholder API endpoint to satisfy url_for('api_chat') or client requests ---
 @app.route('/api/chat', methods=['POST'])
-@login_required
 def api_chat():
     payload = request.get_json(silent=True) or {}
     query = payload.get('message', '')
