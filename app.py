@@ -268,7 +268,6 @@ def map(booking_id):
 
 # --- Added placeholder API endpoint to satisfy url_for('api_chat') or client requests ---
 @app.route('/api/chat', methods=['POST'])
-@login_required
 def api_chat():
     """
     Placeholder API endpoint — many templates/JS call url_for('api_chat').

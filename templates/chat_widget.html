@@ -224,7 +224,8 @@ function removeTyping() {
 }
 
 // Flask API URL (match your route function name)
-const apiChatUrl = "{{ url_for('api_chat') }}";
+// Flask API URL (absolute path since widget is static)
+const apiChatUrl = "https://pregx.onrender.com/api/chat";
 
 // Send message function
 async function sendMessage() {
@@ -249,7 +250,9 @@ async function sendMessage() {
 
         let data = await response.json();
         removeTyping();
-        addMessage(data.response, "bot");
+        // your API returns {status, received, note}
+        // so show data.received instead of data.response
+        addMessage(data.received || data.response || "No response", "bot");
     } catch (err) {
         removeTyping();
         addMessage("⚠️ Error: Could not connect to server", "bot");
