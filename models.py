@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
+from datetime import datetime
 
 db = SQLAlchemy()
 
@@ -28,3 +29,12 @@ class Booking(db.Model):
     timestamp = db.Column(db.DateTime, nullable=False)
     patient = db.relationship('User', backref='bookings')
     ambulance = db.relationship('Ambulance', backref='bookings')
+    
+class Message(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    sender = db.Column(db.String(10), nullable=False)  # "user" or "bot"
+    content = db.Column(db.Text, nullable=False)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship('User', backref='messages')

@@ -1,10 +1,12 @@
-from flask import Flask, render_template, redirect, url_for, flash, request
+from flask import Flask, render_template, redirect, url_for, flash, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, login_user, current_user, logout_user, login_required
 from werkzeug.security import generate_password_hash, check_password_hash
 from models import db, User, Ambulance, Booking
 from forms import RegistrationForm, LoginForm, BookAmbulanceForm, UpdateLocationForm
 from datetime import datetime
+from chat import HealthMateChatbot
+from flask_cors import CORS
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key_here'  # Change this to a random secret key
@@ -15,6 +17,10 @@ db.init_app(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
+
+CORS(app, resources={r"/api/*": {"origins": "*"}})
+
+chatbot = HealthMateChatbot()
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -28,6 +34,22 @@ def index():
         else:
             return redirect(url_for('requests_page'))
     return redirect(url_for('login'))
+
+@app.route("/api/chat", methods=["POST"])
+def api_chat():
+    data = request.get_json()
+    user_msg = data.get("message", "")
+
+    # Ensure it's a string
+    if not isinstance(user_msg, str):
+        return jsonify({"response": "⚠️ Invalid input format. Expected a string."}), 400
+
+    user_msg = user_msg.strip()
+    if not user_msg:
+        return jsonify({"response": "⚠️ Please type a message."}), 400
+
+    response = chatbot.get_response(user_msg)
+    return jsonify({"response": response})
 
 @app.route('/services')
 def services():
