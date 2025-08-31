@@ -1,85 +1,373 @@
 {% extends "layout_quickcare.html" %}
-{% block title %}Map{% endblock %}
+{% block title %}Live Map - QuickCare{% endblock %}
+
+{% block extra_css %}
+<style>
+    .map-container {
+        padding: 20px 0;
+    }
+    
+    .map-header {
+        background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 20px;
+        text-align: center;
+    }
+    
+    .map-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+    
+    .map-subtitle {
+        font-size: 1.1rem;
+        opacity: 0.9;
+    }
+    
+    .participants-info {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+    
+    .participant-card {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        border-left: 4px solid;
+    }
+    
+    .participant-card.patient {
+        border-left-color: #ff6b6b;
+    }
+    
+    .participant-card.driver {
+        border-left-color: #28a745;
+    }
+    
+    .participant-icon {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+    }
+    
+    .participant-role {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+    
+    .participant-name {
+        font-size: 1rem;
+        color: #666;
+        margin-bottom: 10px;
+    }
+    
+    .participant-status {
+        display: inline-block;
+        padding: 5px 15px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+    
+    .status-pending {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .status-en-route {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .status-arrived {
+        background: #cce5ff;
+        color: #004085;
+    }
+    
+    #map {
+        height: 500px;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .map-legend {
+        background: white;
+        padding: 15px;
+        border-radius: 10px;
+        margin-top: 20px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+    
+    .legend-title {
+        font-weight: 600;
+        margin-bottom: 10px;
+        color: #333;
+    }
+    
+    .legend-items {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+    
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.9rem;
+    }
+    
+    .legend-marker {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+    
+    .marker-patient {
+        background: #ff6b6b;
+    }
+    
+    .marker-driver {
+        background: #28a745;
+    }
+    
+    .marker-hospital {
+        background: #007bff;
+    }
+    
+    .marker-route {
+        background: #dc3545;
+    }
+    
+    @media (max-width: 768px) {
+        .participants-info {
+            grid-template-columns: 1fr;
+        }
+        
+        .map-title {
+            font-size: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-    <h2>Live Map</h2>
-    <div id="map" style="height: 500px;"></div>
+<div class="map-container">
+    <!-- Map Header -->
+    <div class="map-header">
+        <h1 class="map-title">🚑 Live Map</h1>
+        <p class="map-subtitle">Real-time tracking of ambulance and patient locations</p>
+    </div>
 
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+    <!-- Participants Information -->
+    <div class="participants-info">
+        <div class="participant-card patient">
+            <div class="participant-icon">👤</div>
+            <div class="participant-role">Patient</div>
+            <div class="participant-name">{{ booking.patient.username if booking.patient else 'Patient' }}</div>
+            <div class="participant-status status-pending">Waiting for pickup</div>
+        </div>
+        
+        <div class="participant-card driver">
+            <div class="participant-icon">🚗</div>
+            <div class="participant-role">Ambulance Driver</div>
+            <div class="participant-name">{{ booking.ambulance.driver.username if booking.ambulance.driver else 'Driver' }}</div>
+            <div class="participant-status status-en-route">En route to patient</div>
+        </div>
+    </div>
 
-    <script>
-        var map = L.map('map').setView([{{ patient_lat }}, {{ patient_lng }}], 13);
+    <!-- Map -->
+    <div id="map"></div>
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+    <!-- Map Legend -->
+    <div class="map-legend">
+        <div class="legend-title">Map Legend</div>
+        <div class="legend-items">
+            <div class="legend-item">
+                <span class="legend-marker marker-patient"></span>
+                <span>Patient Location</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-marker marker-driver"></span>
+                <span>Ambulance Driver</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-marker marker-hospital"></span>
+                <span>Nearby Hospitals</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-marker marker-route"></span>
+                <span>Route to Patient (Red Path)</span>
+            </div>
+        </div>
+    </div>
+</div>
 
-        // Patient marker
-        var patientMarker = L.marker([{{ patient_lat }}, {{ patient_lng }}])
-            .addTo(map)
-            .bindPopup('Patient Location');
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
 
-        // Driver marker
-        var driverMarker = L.marker([{{ driver_lat }}, {{ driver_lng }}])
-            .addTo(map)
-            .bindPopup('Driver Location');
+<script>
+    // Initialize map
+    var map = L.map('map').setView([{{ patient_lat }}, {{ patient_lng }}], 13);
 
-        // Draw route between driver and patient
-        L.Routing.control({
-            waypoints: [
-                L.latLng({{ driver_lat }}, {{ driver_lng }}),
-                L.latLng({{ patient_lat }}, {{ patient_lng }})
-            ],
-            routeWhileDragging: false,
-            addWaypoints: false,
-            draggableWaypoints: false,
-            createMarker: function() { return null; } // hide default markers
-        }).addTo(map);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
 
-        // 🔹 Fetch nearby hospitals (up to 20)
-        var overpassUrl = "https://overpass-api.de/api/interpreter";
-        var query = `
-            [out:json];
-            (
-              node["amenity"="hospital"](around:5000, {{ patient_lat }}, {{ patient_lng }});
-              way["amenity"="hospital"](around:5000, {{ patient_lat }}, {{ patient_lng }});
-              relation["amenity"="hospital"](around:5000, {{ patient_lat }}, {{ patient_lng }});
-            );
-            out center 20;
-        `;
+    // Custom icons for better visibility
+    var patientIcon = L.divIcon({
+        className: 'custom-div-icon',
+        html: "<div style='background-color: #ff6b6b; width: 35px; height: 35px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 18px;'>👤</div>",
+        iconSize: [35, 35],
+        iconAnchor: [17.5, 17.5]
+    });
 
-        fetch(overpassUrl, { method: "POST", body: query })
-        .then(response => response.json())
-        .then(data => {
-            data.elements.forEach(function(element, index) {
-                var lat = element.lat || element.center.lat;
-                var lon = element.lon || element.center.lon;
-                var name = element.tags.name || "Hospital " + (index+1);
+    var driverIcon = L.divIcon({
+        className: 'custom-div-icon',
+        html: "<div style='background-color: #28a745; width: 35px; height: 35px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 18px;'>🚗</div>",
+        iconSize: [35, 35],
+        iconAnchor: [17.5, 17.5]
+    });
 
-                // Add hospital marker
-                var hospitalMarker = L.marker([lat, lon], {
-                    icon: L.icon({
-                        iconUrl: 'https://cdn-icons-png.flaticon.com/512/854/854878.png',
-                        iconSize: [25, 25]
-                    })
-                }).addTo(map).bindPopup("<b>" + name + "</b>");
+    var hospitalIcon = L.divIcon({
+        className: 'custom-div-icon',
+        html: "<div style='background-color: #007bff; width: 30px; height: 30px; border-radius: 50%; border: 3px solid white; box-shadow: 0 2px 5px rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 16px;'>🏥</div>",
+        iconSize: [30, 30],
+        iconAnchor: [15, 15]
+    });
 
-                // Draw route from patient → hospital
-                L.Routing.control({
-                    waypoints: [
-                        L.latLng({{ patient_lat }}, {{ patient_lng }}),
-                        L.latLng(lat, lon)
-                    ],
-                    lineOptions: {
-                        styles: [{ color: 'red', opacity: 0.6, weight: 3 }]
-                    },
-                    routeWhileDragging: false,
-                    addWaypoints: false,
-                    draggableWaypoints: false,
-                    createMarker: function() { return null; } // hide routing markers
-                }).addTo(map);
-            });
-        })
-        .catch(err => console.error(err));
-    </script>
-    {% include "chat_widget.html" %}
+    // Patient marker with detailed popup and name
+    var patientMarker = L.marker([{{ patient_lat }}, {{ patient_lng }}], { icon: patientIcon })
+        .addTo(map)
+        .bindPopup(`
+            <div style="text-align: center; min-width: 220px;">
+                <div style="font-size: 2.5rem; margin-bottom: 10px;">👤</div>
+                <div style="font-weight: bold; color: #ff6b6b; margin-bottom: 5px; font-size: 1.1rem;">Patient Location</div>
+                <div style="color: #333; margin-bottom: 10px; font-weight: 600; font-size: 1.2rem;">{{ booking.patient.username if booking.patient else 'Patient' }}</div>
+                <div style="background: #fff3cd; color: #856404; padding: 8px 12px; border-radius: 5px; font-size: 0.9rem; margin-bottom: 8px;">
+                    Waiting for ambulance pickup
+                </div>
+                <div style="color: #666; font-size: 0.85rem;">
+                    Coordinates: {{ patient_lat }}, {{ patient_lng }}
+                </div>
+            </div>
+        `);
+
+    // Driver marker with detailed popup
+    var driverMarker = L.marker([{{ driver_lat }}, {{ driver_lng }}], { icon: driverIcon })
+        .addTo(map)
+        .bindPopup(`
+            <div style="text-align: center; min-width: 220px;">
+                <div style="font-size: 2.5rem; margin-bottom: 10px;">🚗</div>
+                <div style="font-weight: bold; color: #28a745; margin-bottom: 5px; font-size: 1.1rem;">Ambulance Driver</div>
+                <div style="color: #333; margin-bottom: 10px; font-weight: 600; font-size: 1.2rem;">{{ booking.ambulance.driver.username if booking.ambulance.driver else 'Driver' }}</div>
+                <div style="background: #d4edda; color: #155724; padding: 8px 12px; border-radius: 5px; font-size: 0.9rem; margin-bottom: 8px;">
+                    En route to patient
+                </div>
+                <div style="color: #666; font-size: 0.85rem;">
+                    Coordinates: {{ driver_lat }}, {{ driver_lng }}
+                </div>
+            </div>
+        `);
+
+    // Draw route between driver and patient with RED color
+    var routingControl = L.Routing.control({
+        waypoints: [
+            L.latLng({{ driver_lat }}, {{ driver_lng }}),
+            L.latLng({{ patient_lat }}, {{ patient_lng }})
+        ],
+        lineOptions: {
+            styles: [{ 
+                color: '#dc3545',  // Red color for the path
+                opacity: 0.8, 
+                weight: 5,
+                dashArray: '10, 5'
+            }]
+        },
+        routeWhileDragging: false,
+        addWaypoints: false,
+        draggableWaypoints: false,
+        createMarker: function() { return null; }, // hide default markers
+        showAlternatives: false,
+        fitSelectedRoutes: false
+    }).addTo(map);
+
+    // Add route summary with ETA
+    routingControl.on('routesfound', function(e) {
+        var routes = e.routes;
+        var summary = routes[0].summary;
+        var distance = (summary.totalDistance / 1000).toFixed(1);
+        var time = Math.round(summary.totalTime / 60);
+        
+        // Update driver status with ETA
+        var driverStatus = document.querySelector('.participant-card.driver .participant-status');
+        driverStatus.textContent = `ETA: ${time} minutes (${distance} km)`;
+        driverStatus.className = 'participant-status status-en-route';
+        
+        // Update patient status to show driver is coming
+        var patientStatus = document.querySelector('.participant-card.patient .participant-status');
+        patientStatus.textContent = `Driver arriving in ${time} minutes`;
+        patientStatus.className = 'participant-status status-en-route';
+    });
+
+    // Fetch nearby hospitals
+    var overpassUrl = "https://overpass-api.de/api/interpreter";
+    var query = `
+        [out:json];
+        (
+          node["amenity"="hospital"](around:5000, {{ patient_lat }}, {{ patient_lng }});
+          way["amenity"="hospital"](around:5000, {{ patient_lat }}, {{ patient_lng }});
+          relation["amenity"="hospital"](around:5000, {{ patient_lat }}, {{ patient_lng }});
+        );
+        out center 8;
+    `;
+
+    fetch(overpassUrl, { method: "POST", body: query })
+    .then(response => response.json())
+    .then(data => {
+        data.elements.forEach(function(element, index) {
+            var lat = element.lat || element.center.lat;
+            var lon = element.lon || element.center.lon;
+            var name = element.tags.name || "Hospital " + (index+1);
+
+            // Add hospital marker
+            var hospitalMarker = L.marker([lat, lon], { icon: hospitalIcon })
+                .addTo(map)
+                .bindPopup(`
+                    <div style="text-align: center; min-width: 180px;">
+                        <div style="font-size: 1.8rem; margin-bottom: 5px;">🏥</div>
+                        <div style="font-weight: bold; color: #007bff; margin-bottom: 5px; font-size: 1rem;">${name}</div>
+                        <div style="color: #666; font-size: 0.9rem;">Emergency Hospital</div>
+                    </div>
+                `);
+        });
+    })
+    .catch(err => console.error('Error fetching hospitals:', err));
+
+    // Auto-refresh driver location every 30 seconds (simulate real-time updates)
+    setInterval(function() {
+        // In a real application, you would fetch the latest driver location from the server
+        console.log('Updating driver location...');
+        // driverMarker.setLatLng([newLat, newLng]);
+    }, 30000);
+
+    // Add click event to show patient location prominently
+    patientMarker.on('click', function() {
+        map.setView([{{ patient_lat }}, {{ patient_lng }}], 15);
+    });
+
+    // Add click event to show driver location
+    driverMarker.on('click', function() {
+        map.setView([{{ driver_lat }}, {{ driver_lng }}], 15);
+    });
+</script>
 {% endblock %}
