@@ -61,7 +61,6 @@ the app will be available at http://127.0.0.1:5000
 ---
 
 ## 📊 Future Enhancements
-- 🔒 **Authentication** for drivers & patients  
 - 📡 **Real-time updates** via WebSockets  
 - 📱 **Mobile-first UI** for faster patient requests  
 - 🤖 **AI-based risk predictor** (integration with patient health data)  
